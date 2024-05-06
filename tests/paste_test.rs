@@ -1,61 +1,6 @@
 mod utils;
 
-#[tokio::test]
-async fn paste_returns_a_200_and_paste_id_when_ok() {
-    let app = utils::spawn_app().await;
-    let client = reqwest::Client::new();
-    let paste_id = "abc";
-
-    let response = client
-        .post(&format!("{}/paste/{}", &app.address, &paste_id))
-        .header("Content-Type", "text/plain")
-        .body("somecontent")
-        .send()
-        .await
-        .expect("Failed to execute request");
-    assert_eq!(200, response.status().as_u16());
-
-    let payload = response.text().await.expect("Failed to get response data");
-    assert_eq!(paste_id, payload);
-}
-
-#[tokio::test]
-async fn paste_returns_a_400_when_content_bad() {
-    let app = utils::spawn_app().await;
-    let client = reqwest::Client::new();
-    let paste_id = "abc";
-
-    let response = client
-        .post(&format!("{}/paste/{}", &app.address, &paste_id))
-        .header("Content-Type", "text/plain")
-        .body("")
-        .send()
-        .await
-        .expect("Failed to execute request");
-    assert_eq!(400, response.status().as_u16());
-
-    let payload = response.text().await.expect("Failed to get response data");
-    assert_eq!("not valid paste content - empty string", payload);
-}
-
-#[tokio::test]
-async fn paste_generates_paste_id_when_none_provided() {
-    let app = utils::spawn_app().await;
-    let client = reqwest::Client::new();
-
-    let response = client
-        .post(&format!("{}/paste", &app.address))
-        .header("Content-Type", "text/plain")
-        .body("somecontent")
-        .send()
-        .await
-        .expect("Failed to execute request");
-    assert_eq!(200, response.status().as_u16());
-
-    let payload = response.text().await.expect("Failed to get response data");
-    assert_eq!(36, payload.len()); // UUID
-}
-
+// GET /paste
 #[tokio::test]
 async fn get_paste_returns_paste_when_exists() {
     let app = utils::spawn_app().await;
@@ -102,7 +47,67 @@ async fn get_paste_returns_404_when_not_found() {
 }
 
 #[tokio::test]
-async fn paste_returns_a_400_when_invalid_paste_id() {
+async fn get_paste_returns_400_when_bad_id() {
+    let app = utils::spawn_app().await;
+    let client = reqwest::Client::new();
+    let paste_id = ":{";
+
+    let response = client
+        .get(&format!("{}/paste/{}", &app.address, &paste_id))
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(400, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+    assert_eq!(
+        format!("{} is not a valid paste id - invalid char", paste_id),
+        payload
+    );
+}
+
+// POST /paste
+
+#[tokio::test]
+async fn paste_returns_200_and_id_when_ok() {
+    let app = utils::spawn_app().await;
+    let client = reqwest::Client::new();
+    let paste_id = "abc";
+
+    let response = client
+        .post(&format!("{}/paste/{}", &app.address, &paste_id))
+        .header("Content-Type", "text/plain")
+        .body("somecontent")
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(200, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+    assert_eq!(paste_id, payload);
+}
+
+#[tokio::test]
+async fn paste_returns_400_when_invalid_content() {
+    let app = utils::spawn_app().await;
+    let client = reqwest::Client::new();
+    let paste_id = "abc";
+
+    let response = client
+        .post(&format!("{}/paste/{}", &app.address, &paste_id))
+        .header("Content-Type", "text/plain")
+        .body("")
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(400, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+    assert_eq!("not valid paste content - empty string", payload);
+}
+
+#[tokio::test]
+async fn paste_returns_400_when_invalid_id() {
     let app = utils::spawn_app().await;
     let client = reqwest::Client::new();
     let paste_id = "{s";
@@ -121,4 +126,53 @@ async fn paste_returns_a_400_when_invalid_paste_id() {
         format!("{} is not a valid paste id - invalid char", paste_id),
         payload
     );
+}
+
+#[tokio::test]
+async fn paste_generates_id_when_none_provided() {
+    let app = utils::spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(&format!("{}/paste", &app.address))
+        .header("Content-Type", "text/plain")
+        .body("somecontent")
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(200, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+    assert_eq!(36, payload.len()); // UUID
+}
+
+// Full workflows
+#[tokio::test]
+async fn generated_id_retrieves_paste() {
+    let app = utils::spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let content = "somecontent";
+
+    let response = client
+        .post(&format!("{}/paste", &app.address))
+        .header("Content-Type", "text/plain")
+        .body(content)
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(200, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+
+    let response = client
+        .get(&format!("{}/paste/{}", &app.address, payload))
+        .header("Content-Type", "text/plain")
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(200, response.status().as_u16());
+
+    let payload = response.text().await.expect("Failed to get response data");
+    assert_eq!(content, payload);
 }
