@@ -16,6 +16,7 @@ pub fn run<R: Repository>(
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .route("/", web::get().to(routes::index))
             .route("/health", web::get().to(routes::health))
             .route("/paste", web::post().to(routes::create_paste_sans_id::<R>))
             .route("/paste/{id}", web::post().to(routes::create_paste::<R>))

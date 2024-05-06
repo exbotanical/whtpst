@@ -1,14 +1,14 @@
-use gossip::{
-    config::{get_config, DatabaseSettings},
-    dao::{InMemoryRepository, Repository},
-    startup::run,
-    telemetry::{get_subscriber, init_subscriber},
-};
 use once_cell::sync::Lazy;
 use sqlx::Executor;
 use sqlx::{Connection, PgConnection, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
+use whtpst::{
+    config::{get_config, DatabaseSettings},
+    dao::{InMemoryRepository, Repository},
+    startup::run,
+    telemetry::{get_subscriber, init_subscriber},
+};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".into();

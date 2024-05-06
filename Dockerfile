@@ -15,7 +15,7 @@ COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
 ENV SQLX_OFFLINE true
-RUN cargo build --release --bin gossip
+RUN cargo build --release --bin whtpst
 
 FROM debian:bullseye-slim AS runtime
 
@@ -25,8 +25,8 @@ RUN apt-get update -y \
   && apt-get autoremove -y \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/gossip gossip
+COPY --from=builder /app/target/release/whtpst whtpst
 COPY config config
 ENV APP_ENVIRONMENT production
 
-ENTRYPOINT ["./gossip"]
+ENTRYPOINT ["./whtpst"]
