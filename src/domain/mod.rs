@@ -1,4 +1,3 @@
-mod email;
 mod new_paste;
 mod paste_content;
 mod paste_id;

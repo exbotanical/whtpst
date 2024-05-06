@@ -1,4 +1,3 @@
-use secrecy::Secret;
 use serde_aux::field_attributes::deserialize_number_from_string;
 
 #[derive(serde::Deserialize)]

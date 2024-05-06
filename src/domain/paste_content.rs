@@ -14,12 +14,10 @@ impl PasteContent {
     }
 
     pub fn parse_bytes(bytes: Bytes) -> Result<PasteContent, String> {
-        let paste_content = match String::from_utf8(bytes.to_vec()) {
-            Ok(p) => p,
-            Err(e) => return Err(e.to_owned().to_string()),
-        };
-
-        return PasteContent::parse(paste_content);
+        match String::from_utf8(bytes.to_vec()) {
+            Ok(p) => PasteContent::parse(p),
+            Err(e) => Err(e.to_owned().to_string()),
+        }
     }
 }
 
