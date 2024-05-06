@@ -33,20 +33,3 @@ pub trait Repository: Sync + Send + 'static {
     fn find_one(&self, id: PasteId) -> Result<PasteContent, RepositoryError>;
     fn insert(&mut self, entity: NewPaste) -> Result<(), RepositoryError>;
 }
-
-//     sqlx::query!(
-//         r#"
-//     INSERT INTO subscriptions (id, email, name, subscribed_at)
-//     VALUES ($1, $2, $3, $4)
-//     "#,
-//         Uuid::new_v4(),
-//         new_subscriber.email.as_ref(),
-//         new_subscriber.name.as_ref(),
-//         Utc::now()
-//     )
-//     .execute(pool)
-//     .await
-//     .map_err(|e| {
-//         tracing::error!("Failed to execute query {:?}", e);
-//         e
-//     })?;

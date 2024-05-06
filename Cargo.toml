@@ -28,26 +28,6 @@ unicode-segmentation = "1"
 validator = "0.14"
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
 
-[dependencies.sqlx]
-version = "0.5.7"
-default-features = false
-features = [
-  # Use actix runtime for futures, use rustls as TLS backend
-  "runtime-actix-rustls",
-  # Gives us access to sqlx::query! and sqlx::query_as!
-  "macros",
-  # Postgres functionality
-  "postgres",
-  # SQL UUIDs
-  "uuid",
-  # SQL timestamptz
-  "chrono",
-  # sqlx-cli migrations
-  "migrate",
-  # allow compilation in isolated envs e.g. docker
-  "offline"
-]
-
 [dev-dependencies]
 once_cell = "1.18.0"
 claim = "0.5"
@@ -56,3 +36,4 @@ quickcheck = "1.0"
 quickcheck_macros = "1.0.0"
 tokio = { version = "1", features = ["macros", "rt"] }
 wiremock = "0.6"
+rand = "0.8.5"

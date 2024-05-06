@@ -1,4 +1,3 @@
-use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use whtpst::{
     config::get_config,
@@ -14,13 +13,10 @@ async fn main() -> std::io::Result<()> {
 
     let config = get_config().expect("Failed to read config file");
     let repo = InMemoryRepository::new();
-    let connection_pool = PgPoolOptions::new()
-        .connect_timeout(std::time::Duration::from_secs(2))
-        .connect_lazy_with(config.database.with_db());
 
     let address = format!("{}:{}", config.application.host, config.application.port);
     let listener = TcpListener::bind(address)?;
 
-    run(listener, connection_pool, repo)?.await?;
+    run(listener, repo)?.await?;
     Ok(())
 }
