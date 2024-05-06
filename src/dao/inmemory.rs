@@ -17,7 +17,7 @@ impl Repository for InMemoryRepository {
     fn find_one(&self, id: PasteId) -> Result<PasteContent, super::repository::RepositoryError> {
         match self.data.get(&id) {
             Some(d) => return Ok(d.to_owned()),
-            None => return Err(RepositoryError::NotFound("s".into())),
+            None => return Err(RepositoryError::NotFound(id.as_ref().to_owned())),
         }
     }
 

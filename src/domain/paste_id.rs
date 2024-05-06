@@ -10,7 +10,7 @@ const FORBIDDEN_CHARS: [char; 9] = ['/', '(', ')', '"', '<', '>', '\\', '{', '}'
 impl PasteId {
     pub fn parse(s: String) -> Result<PasteId, String> {
         if s.trim().is_empty() {
-            return Err(format!("{} is not a valid paste id - empty string", s));
+            return Err("not a valid paste id - empty string".to_string());
         }
 
         if s.graphemes(true).count() > 256 {

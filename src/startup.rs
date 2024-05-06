@@ -17,13 +17,9 @@ pub fn run<R: Repository>(
         App::new()
             .wrap(TracingLogger::default())
             .route("/health", web::get().to(routes::health))
-            .route(
-                "/paste",
-                web::post().to(routes::create_paste_random_id::<R>),
-            )
+            .route("/paste", web::post().to(routes::create_paste_sans_id::<R>))
             .route("/paste/{id}", web::post().to(routes::create_paste::<R>))
             .route("/paste/{id}", web::get().to(routes::get_paste::<R>))
-            // .route("/paste", web::post().to(routes::paste::<R>))
             .app_data(web::Data::clone(&repo))
             .app_data(web::Data::clone(&db_pool))
     })

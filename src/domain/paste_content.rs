@@ -1,5 +1,5 @@
+use actix_web::web::Bytes;
 use serde::Deserialize;
-use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct PasteContent(String);
@@ -7,14 +7,19 @@ pub struct PasteContent(String);
 impl PasteContent {
     pub fn parse(s: String) -> Result<PasteContent, String> {
         if s.trim().is_empty() {
-            return Err(format!("{} is not valid paste content - empty string", s));
-        }
-
-        if s.graphemes(true).count() > 256 {
-            return Err(format!("{} is not valid paste content - too long", s));
+            return Err("not valid paste content - empty string".to_string());
         }
 
         Ok(Self(s))
+    }
+
+    pub fn parse_bytes(bytes: Bytes) -> Result<PasteContent, String> {
+        let paste_content = match String::from_utf8(bytes.to_vec()) {
+            Ok(p) => p,
+            Err(e) => return Err(e.to_owned().to_string()),
+        };
+
+        return PasteContent::parse(paste_content);
     }
 }
 
@@ -30,15 +35,9 @@ mod tests {
     use claim::{assert_err, assert_ok};
 
     #[test]
-    fn a_256_grapheme_long_name_is_valid() {
+    fn normal_string_is_valid() {
         let name = "a".repeat(256);
         assert_ok!(PasteContent::parse(name));
-    }
-
-    #[test]
-    fn a_name_longer_than_256_graphemes_is_rejected() {
-        let name = "a".repeat(257);
-        assert_err!(PasteContent::parse(name));
     }
 
     #[test]

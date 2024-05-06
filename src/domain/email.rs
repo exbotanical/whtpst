@@ -1,10 +1,10 @@
 use validator::validate_email;
 
 #[derive(Debug)]
-pub struct PasterEmail(String);
+pub struct Email(String);
 
-impl PasterEmail {
-    pub fn parse(s: String) -> Result<PasterEmail, String> {
+impl Email {
+    pub fn parse(s: String) -> Result<Email, String> {
         if validate_email(&s) {
             Ok(Self(s))
         } else {
@@ -13,7 +13,7 @@ impl PasterEmail {
     }
 }
 
-impl AsRef<str> for PasterEmail {
+impl AsRef<str> for Email {
     fn as_ref(&self) -> &str {
         &self.0
     }
@@ -21,7 +21,7 @@ impl AsRef<str> for PasterEmail {
 
 #[cfg(test)]
 mod tests {
-    use super::PasterEmail;
+    use super::Email;
     use claim::assert_err;
     use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
@@ -39,23 +39,23 @@ mod tests {
     #[test]
     fn empty_string_is_rejected() {
         let email = "".to_string();
-        assert_err!(PasterEmail::parse(email));
+        assert_err!(Email::parse(email));
     }
 
     #[test]
     fn email_missing_at_symbol_is_rejected() {
         let email = "somedomain.com".to_string();
-        assert_err!(PasterEmail::parse(email));
+        assert_err!(Email::parse(email));
     }
 
     #[test]
     fn email_missing_subject_is_rejected() {
         let email = "@domain.com".to_string();
-        assert_err!(PasterEmail::parse(email));
+        assert_err!(Email::parse(email));
     }
 
     #[quickcheck_macros::quickcheck]
     fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
-        PasterEmail::parse(valid_email.0).is_ok()
+        Email::parse(valid_email.0).is_ok()
     }
 }
