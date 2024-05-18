@@ -30,7 +30,7 @@ impl AsRef<str> for PasteContent {
 #[cfg(test)]
 mod tests {
     use crate::domain::PasteContent;
-    use claim::{assert_err, assert_ok};
+    use claims::{assert_err, assert_ok};
 
     #[test]
     fn normal_string_is_valid() {

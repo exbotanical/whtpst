@@ -1,0 +1,4 @@
+[advisories]
+ignore = [
+    { crate = "yaml-rust@0.4.5", reason = "not a big risk; transitive dep used by config" },
+]
